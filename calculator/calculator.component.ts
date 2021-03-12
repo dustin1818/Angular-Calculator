@@ -47,9 +47,13 @@ export class CalculatorComponent implements OnInit {
   }
 
   cancelKey(){
-    this.mainDisplayText = '';
-    this.subDisplayText = '';
-    this.operatorSet = false;
+
+    if (this.mainDisplayText !="" ) {
+      this.mainDisplayText=this.mainDisplayText.substr(0, this.mainDisplayText.length-1)
+  }
+  // this.subDisplayText = '';
+  // this.operatorSet = true;
+
 }
 
 
