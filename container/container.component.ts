@@ -11,5 +11,10 @@ export class ContainerComponent implements OnInit {
 
   ngOnInit(): void {
   }
+  subDisplayText = ''; 
+  mainDisplayText = '';
+  operand1: number;
+  operand2: number;
+  operator = '';
 
 }

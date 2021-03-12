@@ -12,106 +12,84 @@ export class CalculatorComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  subDisplayText = ''; 
+  mainDisplayText = '';
+  operand1: number;
+  operand2: number;
+  operatorSet = false; 
+  calculationString = '';
+  operator = '';
+  answered = false;
 
-  input:string = '';
-  result:string = '';
-  keyboardInput: string = '';
-  keyboardInputNum = /[0-9]/;
-  
-  onKey(event: any) {
-    this.keyboardInput = event.key;
-    if(this.keyboardInputNum.test(this.keyboardInput)){
-      this.pressNum(event.key);
-    console.log(event)
-    }
-
-  }
-
-  pressNum(num: string) {
-    
-    //If decimal point was pressed more than once
-    if (num==".") {
-      if (this.input !="" ) {
- 
-        const lastNum=this.getLastOperand()
-        console.log(lastNum.lastIndexOf("."))
-        if (lastNum.lastIndexOf(".") >= 0) return;
+  pressKey(key: string) {
+    if (key === '/' || key === 'x' || key === '-' || key === '+') {
+      const lastKey = this.mainDisplayText[this.mainDisplayText.length - 1];
+      if (lastKey === '/' || lastKey === 'x' || lastKey === '-' || lastKey === '+') {
+        this.operatorSet = true;
       }
-    }
- 
-    //If the first input is 0
-    if (num=="0") {
-      if (this.input=="" ) {
+      if ((this.operatorSet) || (this.mainDisplayText === '')) {
         return;
       }
-      const PrevKey = this.input[this.input.length - 1];
-      if (PrevKey === '/' || PrevKey === '*' || PrevKey === '-' || PrevKey === '+')  {
-          return;
-      }
+      this.operand1 = parseFloat(this.mainDisplayText);
+      this.operator = key;
+      this.operatorSet = true;
     }
- 
-    this.input = this.input + num
-    this.equalResult();
-  }
- 
-  getLastOperand() {
-    let pos:number;
-    console.log(this.input)
-    pos=this.input.toString().lastIndexOf("+")
-    if (this.input.toString().lastIndexOf("-") > pos) pos=this.input.lastIndexOf("-")
-    if (this.input.toString().lastIndexOf("*") > pos) pos=this.input.lastIndexOf("*")
-    if (this.input.toString().lastIndexOf("/") > pos) pos=this.input.lastIndexOf("/")
-    console.log('Last '+this.input.substr(pos+1))
-    return this.input.substr(pos+1)
-  }
- 
-  pressOperator(op: string) {
- 
-    //If operator was pressed more than once
-    const lastInput = this.input[this.input.length - 1];
-    if (lastInput === '/' || lastInput === '*' || lastInput === '-' || lastInput === '+')  {
+    if (this.mainDisplayText.length === 10) {
       return;
     }
-   
-    this.input = this.input + op
-    this.equalResult();
-  }
- 
-  clear() {
-    if (this.input !="" ) {
-      this.input=this.input.substr(0, this.input.length-1)
-    }
-  }
- 
-  allClear() {
-    this.result = '';
-    this.input = '';
-  }
- 
-  equalResult() {
-    let equation = this.input;
- 
-    let lastInput = equation[equation.length - 1];
- 
-    if (lastInput === '.')  {
-      equation=equation.substr(0,equation.length - 1);
-    }
- 
-    lastInput = equation[equation.length - 1];
- 
-    if (lastInput === '/' || lastInput === '*' || lastInput === '-' || lastInput === '+' || lastInput === '.')  {
-      equation=equation.substr(0,equation.length - 1);
-    }
- 
-    console.log("Formula " +equation);
-    this.result = eval(equation);
-  }
- 
-  equalSign() {
-    this.equalResult();
-    this.input = this.result;
-    if (this.input=="0") this.input="";
+    this.mainDisplayText += key;
   }
 
+  allClear() {
+    this.mainDisplayText = '';
+    this.subDisplayText = '';
+    this.operatorSet = false;
+  }
+
+  cancelKey(){
+    if (this.mainDisplayText !="" ) {
+      this.mainDisplayText=this.mainDisplayText.substr(0, this.mainDisplayText.length-1)
+  }
+  // this.subDisplayText = '';
+  // this.operatorSet = true;
 }
 
+
+  getAnswer() {
+    this.calculationString = this.mainDisplayText;
+    this.operand2 = parseFloat(this.mainDisplayText.split(this.operator)[1]);
+    if (this.operator === '/') {
+      this.subDisplayText = this.mainDisplayText;
+      this.mainDisplayText = (this.operand1 / this.operand2).toString();
+      this.subDisplayText = this.calculationString;
+      if (this.mainDisplayText.length > 9) {
+        this.mainDisplayText = this.mainDisplayText.substr(0, 9);
+      }
+    } else if (this.operator === 'x') {
+      this.subDisplayText = this.mainDisplayText;
+      this.mainDisplayText = (this.operand1 * this.operand2).toString();
+      this.subDisplayText = this.calculationString;
+      if (this.mainDisplayText.length > 9) {
+        this.mainDisplayText = 'ERROR';
+        this.subDisplayText = 'Range Exceeded';
+      }
+    } else if (this.operator === '-') {
+      this.subDisplayText = this.mainDisplayText;
+      this.mainDisplayText = (this.operand1 - this.operand2).toString();
+      this.subDisplayText = this.calculationString;
+    } else if (this.operator === '+') {
+      this.subDisplayText = this.mainDisplayText;
+      this.mainDisplayText = (this.operand1 + this.operand2).toString();
+      this.subDisplayText = this.calculationString;
+      if (this.mainDisplayText.length > 9) {
+        this.mainDisplayText = 'ERROR';
+        this.subDisplayText = 'Range Exceeded';
+      }
+    } else {
+      this.subDisplayText = 'ERROR: Invalid Operation';
+    }
+    this.answered = true;
+  }
+}
+
+  
